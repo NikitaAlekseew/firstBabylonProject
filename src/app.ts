@@ -1,25 +1,34 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder } from "@babylonjs/core";
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Size, FreeCamera } from "@babylonjs/core";
+import { Snake } from "./objects/Snake";
+
 
 class App {
     constructor() {
         // create the canvas html element and attach it to the webpage
-        var canvas = document.createElement("canvas");
+        const canvas = document.createElement("canvas");
         canvas.style.width = "100%";
         canvas.style.height = "100%";
         canvas.id = "gameCanvas";
-        document.body.appendChild(canvas);
+        document.body.appendChild(canvas)
 
         // initialize babylon scene and engine
-        var engine = new Engine(canvas, true);
-        var scene = new Scene(engine);
+        const engine = new Engine(canvas, true);
+        const scene = new Scene(engine);
 
-        var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), scene);
+        //camera
+        const camera: ArcRotateCamera = new ArcRotateCamera( "camera", Math.PI / 2, Math.PI / 4, 20, Vector3.Zero(), scene);
         camera.attachControl(canvas, true);
-        var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
-        var sphere: Mesh = MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
+
+        //light
+        const light: HemisphericLight = new HemisphericLight("light", new Vector3(0, 2, -10), scene);
+
+
+        //Add parallelogram
+
+        new Snake(4, scene)
 
         // hide/show the Inspector
         window.addEventListener("keydown", (ev) => {

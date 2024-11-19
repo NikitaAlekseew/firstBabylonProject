@@ -18,7 +18,7 @@ module.exports = {
         static: path.resolve(appDirectory, "public"), //tells webpack to serve from the public folder
         hot: true,
         devMiddleware: {
-            publicPath: "/",
+            publicPath: "/",    
         }
     },
     module: {
