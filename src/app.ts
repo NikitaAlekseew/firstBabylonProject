@@ -1,8 +1,9 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Size, FreeCamera } from "@babylonjs/core";
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Size, FreeCamera, CannonJSPlugin, PhysicsImpostor } from "@babylonjs/core";
 import { Snake } from "./objects/Snake";
+import * as CANNON from "cannon-es";
 
 
 class App {
@@ -24,6 +25,26 @@ class App {
 
         //light
         const light: HemisphericLight = new HemisphericLight("light", new Vector3(0, 2, -10), scene);
+
+        // add physics
+
+        const gravityVector = new Vector3(0, -9.81, 0);
+        scene.enablePhysics(gravityVector, new CannonJSPlugin(true, 10, CANNON))
+
+
+        //add ground
+
+        const ground = MeshBuilder.CreateGround("ground", {
+            width: 20,
+            height: 25
+        }, scene);
+
+        ground.physicsImpostor = new PhysicsImpostor(
+            ground,
+            PhysicsImpostor.BoxImpostor,
+            {mass: 0, friction: 0.5, restitution: 0.3},
+            scene
+        )
 
 
         //Add parallelogram
