@@ -38,7 +38,7 @@ class App {
             width: 20,
             height: 25
         }, scene);
-
+        console.log(ground)
         ground.physicsImpostor = new PhysicsImpostor(
             ground,
             PhysicsImpostor.BoxImpostor,

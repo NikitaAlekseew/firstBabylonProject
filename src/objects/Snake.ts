@@ -1,5 +1,6 @@
 import { PhysicsBody, PhysicsEngine, PhysicsJoint, Scene, Vector3 } from "@babylonjs/core";
 import { Echelon } from "../mesh/Echelon";
+import { DragAndDrop } from "../mechanics/DragAndDrop";
 
 export class Snake {
 
@@ -12,6 +13,7 @@ export class Snake {
     ){
         this.createEchelon()
         this.connectEchelon()
+        new DragAndDrop( this.echelons)
 
     }
 
