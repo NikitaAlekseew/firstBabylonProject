@@ -1,13 +1,23 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Size, FreeCamera, CannonJSPlugin, PhysicsImpostor } from "@babylonjs/core";
+
+import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder, Size, FreeCamera, CannonJSPlugin, PhysicsImpostor, HavokPlugin, PhysicsBody, PhysicsMotionType, PhysicsShapeBox, Quaternion } from "@babylonjs/core";
 import { Snake } from "./objects/Snake";
-import * as CANNON from "cannon-es";
+
+import HavokPhysics from "@babylonjs/havok";
+
+
 
 
 class App {
     constructor() {
+        
+        function getInitializedHavok() {
+            return  HavokPhysics();
+          }
+        
+        
         // create the canvas html element and attach it to the webpage
         const canvas = document.createElement("canvas");
         canvas.style.width = "100%";
@@ -29,32 +39,34 @@ class App {
         // add physics
 
         const gravityVector = new Vector3(0, -9.81, 0);
-        scene.enablePhysics(gravityVector, new CannonJSPlugin(true, 10, CANNON))
+        getInitializedHavok().then(result => scene.enablePhysics(gravityVector, new HavokPlugin(true, result))).then(() =>{
+
+        
+        // scene.enablePhysics(gravityVector, new HavokPlugin(true, getInitializedHavok()))
 
 
         //add ground
 
         const ground = MeshBuilder.CreateGround("ground", {
-            width: 20,
-            height: 25
+            width: 40,
+            height: 50
         }, scene);
-        console.log(ground)
-        ground.physicsImpostor = new PhysicsImpostor(
-            ground,
-            PhysicsImpostor.BoxImpostor,
-            {mass: 0, friction: 0.5, restitution: 0.3},
-            scene
-        )
-
-
+        ground.position= new Vector3 (0, -2, 0)
+        const groundBody = new PhysicsBody(ground, PhysicsMotionType.STATIC, false, scene)
+        const groundShape = new PhysicsShapeBox(new Vector3(), new Quaternion, new Vector3(40, 0, 50), scene)
+        groundBody.shape = groundShape
+        groundBody.setMassProperties({ mass: 0 });
         //Add parallelogram
 
         new Snake(4, scene)
 
+    })
+
         // hide/show the Inspector
         window.addEventListener("keydown", (ev) => {
             // Shift+Ctrl+Alt+I
-            if (ev.shiftKey && ev.ctrlKey && ev.altKey && ev.key === 'i') {
+            if (ev.key === 'i') {
+                console.log('hi')
                 if (scene.debugLayer.isVisible()) {
                     scene.debugLayer.hide();
                 } else {
@@ -67,6 +79,7 @@ class App {
         engine.runRenderLoop(() => {
             scene.render();
         });
+        
     }
 }
 new App();

@@ -1,10 +1,11 @@
-import { Color3, Material, Mesh, PointerDragBehavior, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
+import { Color3, Material, Mesh, PhysicsBody, PhysicsMotionType, PhysicsPrestepType, PhysicsShapeBox, PointerDragBehavior, Quaternion, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
 import { Echelon } from "../mesh/Echelon";
 
 export class DragAndDrop {
 
 
-    private echelons: Echelon[]
+    private echelons: Echelon[];
+    
 
     constructor(echelons: Echelon[]){
 
@@ -15,7 +16,7 @@ export class DragAndDrop {
     private dragAndDrop(){
         for( const echelon of this.echelons){
             const dragBehavior = new PointerDragBehavior({
-                dragAxis: new Vector3(1, 1, 0)
+                dragPlaneNormal: new Vector3(1, 0, 0)
             })
 
             //Add camera drag and drop
@@ -43,10 +44,13 @@ export class DragAndDrop {
                     (echelon.mesh.material as StandardMaterial).diffuseColor = Color3.Random()
                 })
 
-                //fix physics object
-                if(echelon.mesh.physicsImpostor){
-                    echelon.mesh.physicsImpostor.sleep();
-                    console.log(echelon.mesh.id, '------>', echelon.mesh.physicsImpostor)
+                // fix physics object
+                if(echelon.mesh.physicsBody){
+                    const body = echelon.mesh.physicsBody as PhysicsBody;
+                    if(body){
+                        body.setMotionType(PhysicsMotionType.ANIMATED )
+                        console.log(echelon.mesh.physicsBody.getMotionType())
+                    }
                 }
 
             })
@@ -55,8 +59,11 @@ export class DragAndDrop {
             // Event drag and drop
             dragBehavior.onDragObservable.add((event) => {
 
-                if(echelon.mesh.physicsImpostor){
-                    echelon.mesh.position.copyFrom(event.dragPlanePoint)
+                if(echelon.mesh.physicsBody){
+                    echelon.mesh.position.copyFrom(event.dragPlanePoint);
+                    echelon.mesh.physicsBody.setPrestepType(PhysicsPrestepType.ACTION)
+                    // echelon.boxPhysicsAggregate.transformNode.setAbsolutePosition(event.dragPlanePoint)
+
                 }
             });
 
@@ -65,8 +72,9 @@ export class DragAndDrop {
             dragBehavior.onDragEndObservable.add(() =>{
                 
                 // activate physics body
-                if(echelon.mesh.physicsImpostor){
-                    echelon.mesh.physicsImpostor.wakeUp()
+                if(echelon.mesh.physicsBody){
+                    echelon.mesh.physicsBody.setMotionType(PhysicsMotionType.DYNAMIC)
+                    echelon.mesh.physicsBody.setPrestepType(PhysicsPrestepType.TELEPORT)
                 }
             });
 
